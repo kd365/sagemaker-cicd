@@ -24,7 +24,7 @@ class PredictionResponse(BaseModel):
 @app.get("/health")
 def health():
     """Liveness check - is the process alive and responsive?"""
-    return {"status": "healthy", "version": "v2.0"}
+    return {"status": "healthy", "version": "v3.0-cicd"}
 
 @app.get("/ready")
 def ready():
