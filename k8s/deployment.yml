@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sagemaker-fastapi-kh
+  labels:
+    app: sagemaker-fastapi-kh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sagemaker-fastapi-kh
+  template:
+    metadata:
+      labels:
+        app: sagemaker-fastapi-kh
+    spec:
+      imagePullSecrets:
+        - name: registry-secrets-kh
+      containers:
+        - name: sagemaker-fastapi-kh
+          image: ghcr.io/kd365/sagemaker-fastapi:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials-kh
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials-kh
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_DEFAULT_REGION
+              value: "us-west-2"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
